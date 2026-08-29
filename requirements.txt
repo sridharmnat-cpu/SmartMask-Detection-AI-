@@ -1,0 +1,9 @@
+streamlit==1.58.0
+ultralytics==8.4.84
+opencv-python==4.10.0.84
+pillow==12.3.0
+plotly==6.8.0
+pandas==3.0.3
+pyttsx3==2.99
+torch
+torchvision
