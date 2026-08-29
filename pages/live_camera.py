@@ -404,4 +404,3 @@ st.info(
     "through your browser. Click START and choose "
     "**Allow** when Chrome asks for camera permission."
 )
-```
