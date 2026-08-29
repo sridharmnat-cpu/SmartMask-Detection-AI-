@@ -1,8 +1,14 @@
+```python
 import streamlit as st
 import cv2
 import time
 
-from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration
+from streamlit_webrtc import (
+    webrtc_streamer,
+    VideoProcessorBase,
+    RTCConfiguration,
+    WebRtcMode,
+)
 
 from src.config import MODEL_PATH
 from src.detector import load_model, run_inference
@@ -19,6 +25,7 @@ st.markdown(
 )
 
 st.title("Live Camera")
+
 st.caption(
     "Real-time face mask detection using your browser webcam."
 )
@@ -33,10 +40,14 @@ st.write("---")
 try:
     model = load_model(MODEL_PATH)
     model_loaded = True
+
 except Exception as e:
     model = None
     model_loaded = False
-    st.error(f"YOLO model could not be loaded: {e}")
+
+    st.error(
+        f"YOLO model could not be loaded: {e}"
+    )
 
 
 # ============================================================
@@ -46,26 +57,35 @@ except Exception as e:
 col1, col2, col3 = st.columns(3)
 
 with col1:
+
     if model_loaded:
         st.success("● Model: LOADED")
     else:
         st.error("● Model: ERROR")
 
+
 with col2:
+
     st.info("● Camera: BROWSER WEBCAM")
 
+
 with col3:
+
     st.info("● Detection: YOLO ACTIVE")
 
 
 # ============================================================
-# WEBRTC CONFIG
+# WEBRTC CONFIGURATION
 # ============================================================
 
 RTC_CONFIGURATION = RTCConfiguration(
     {
         "iceServers": [
-            {"urls": ["stun:stun.l.google.com:19302"]}
+            {
+                "urls": [
+                    "stun:stun.l.google.com:19302"
+                ]
+            }
         ]
     }
 )
@@ -78,45 +98,73 @@ RTC_CONFIGURATION = RTCConfiguration(
 class MaskDetectionProcessor(VideoProcessorBase):
 
     def __init__(self):
+
         self.model = model
 
+        # Detection statistics
         self.total_persons = 0
         self.mask_count = 0
         self.no_mask_count = 0
+
         self.avg_confidence = 0.0
 
+        # FPS
         self.last_time = time.time()
         self.fps = 0.0
         self.frame_counter = 0
 
+    # ========================================================
+    # RECEIVE FRAME
+    # ========================================================
+
     def recv(self, frame):
 
-        image = frame.to_ndarray(format="bgr24")
+        image = frame.to_ndarray(
+            format="bgr24"
+        )
+
+        # ====================================================
+        # YOLO DETECTION
+        # ====================================================
 
         if self.model is not None:
 
             try:
 
                 # --------------------------------------------
-                # YOLO INFERENCE
+                # GET SETTINGS
+                # --------------------------------------------
+
+                conf_threshold = st.session_state.get(
+                    "conf_threshold",
+                    0.25
+                )
+
+                img_size = st.session_state.get(
+                    "img_size",
+                    640
+                )
+
+                # --------------------------------------------
+                # RUN YOLO
                 # --------------------------------------------
 
                 detections, raw_result = run_inference(
                     model=self.model,
                     frame=image,
-                    conf_threshold=st.session_state.get(
-                        "conf_threshold", 0.25
-                    ),
-                    imgsz=st.session_state.get(
-                        "img_size", 640
-                    )
+                    conf_threshold=conf_threshold,
+                    imgsz=img_size
                 )
 
                 # --------------------------------------------
-                # COUNTS
+                # TOTAL DETECTIONS
                 # --------------------------------------------
 
                 self.total_persons = len(detections)
+
+                # --------------------------------------------
+                # MASK COUNT
+                # --------------------------------------------
 
                 self.mask_count = sum(
                     1
@@ -124,18 +172,32 @@ class MaskDetectionProcessor(VideoProcessorBase):
                     if d.category == "mask"
                 )
 
+                # --------------------------------------------
+                # NO MASK COUNT
+                # --------------------------------------------
+
                 self.no_mask_count = sum(
                     1
                     for d in detections
                     if d.category == "no_mask"
                 )
 
+                # --------------------------------------------
+                # AVERAGE CONFIDENCE
+                # --------------------------------------------
+
                 if self.total_persons > 0:
+
                     self.avg_confidence = (
-                        sum(d.confidence for d in detections)
+                        sum(
+                            d.confidence
+                            for d in detections
+                        )
                         / self.total_persons
                     )
+
                 else:
+
                     self.avg_confidence = 0.0
 
                 # --------------------------------------------
@@ -163,9 +225,15 @@ class MaskDetectionProcessor(VideoProcessorBase):
                     2
                 )
 
-                print(f"Detection error: {e}")
+                print(
+                    f"Detection error: {e}"
+                )
 
         else:
+
+            # =================================================
+            # MODEL NOT LOADED
+            # =================================================
 
             annotated = image.copy()
 
@@ -174,29 +242,35 @@ class MaskDetectionProcessor(VideoProcessorBase):
                 "YOLO MODEL NOT LOADED",
                 (20, 40),
                 cv2.FONT_HERSHEY_SIMPLEX,
-                1,
+                0.9,
                 (0, 0, 255),
                 2
             )
 
         # ====================================================
-        # FPS
+        # FPS CALCULATION
         # ====================================================
 
         self.frame_counter += 1
 
         current_time = time.time()
-        elapsed = current_time - self.last_time
+
+        elapsed = (
+            current_time - self.last_time
+        )
 
         if elapsed >= 1.0:
 
-            self.fps = self.frame_counter / elapsed
+            self.fps = (
+                self.frame_counter / elapsed
+            )
 
             self.frame_counter = 0
+
             self.last_time = current_time
 
         # ====================================================
-        # LIVE OVERLAY
+        # LIVE STATISTICS OVERLAY
         # ====================================================
 
         cv2.rectangle(
@@ -206,6 +280,10 @@ class MaskDetectionProcessor(VideoProcessorBase):
             (255, 255, 255),
             -1
         )
+
+        # ----------------------------------------------------
+        # FPS
+        # ----------------------------------------------------
 
         cv2.putText(
             annotated,
@@ -217,6 +295,10 @@ class MaskDetectionProcessor(VideoProcessorBase):
             2
         )
 
+        # ----------------------------------------------------
+        # PERSONS
+        # ----------------------------------------------------
+
         cv2.putText(
             annotated,
             f"Persons: {self.total_persons}",
@@ -226,6 +308,10 @@ class MaskDetectionProcessor(VideoProcessorBase):
             (20, 20, 20),
             2
         )
+
+        # ----------------------------------------------------
+        # MASK
+        # ----------------------------------------------------
 
         cv2.putText(
             annotated,
@@ -237,6 +323,10 @@ class MaskDetectionProcessor(VideoProcessorBase):
             2
         )
 
+        # ----------------------------------------------------
+        # NO MASK
+        # ----------------------------------------------------
+
         cv2.putText(
             annotated,
             f"No Mask: {self.no_mask_count}",
@@ -246,6 +336,10 @@ class MaskDetectionProcessor(VideoProcessorBase):
             (0, 0, 220),
             2
         )
+
+        # ====================================================
+        # RETURN FRAME
+        # ====================================================
 
         return frame.from_ndarray(
             annotated,
@@ -266,25 +360,36 @@ with st.container(border=True):
         "when your browser asks."
     )
 
+    # ========================================================
+    # START WEBRTC
+    # ========================================================
+
     if model_loaded:
 
         webrtc_ctx = webrtc_streamer(
             key="smartmask-live-camera",
-            mode="SENDRECV",
+
+            # IMPORTANT:
+            # Use WebRtcMode enum instead of string
+            mode=WebRtcMode.SENDRECV,
+
             rtc_configuration=RTC_CONFIGURATION,
+
             video_processor_factory=MaskDetectionProcessor,
+
             media_stream_constraints={
                 "video": True,
-                "audio": False
+                "audio": False,
             },
+
             async_processing=True,
         )
 
     else:
 
         st.error(
-            "Camera cannot start because the YOLO model "
-            "is not loaded."
+            "Camera cannot start because the "
+            "YOLO model is not loaded."
         )
 
 
@@ -299,3 +404,4 @@ st.info(
     "through your browser. Click START and choose "
     "**Allow** when Chrome asks for camera permission."
 )
+```
