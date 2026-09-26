@@ -865,34 +865,21 @@ pg = st.navigation(
 # ============================================================
 
 with st.sidebar:
-
     st.markdown(
         """
         <div class="sidebar-brand">
-
-            <div class="sidebar-logo">
-                🛡️
-            </div>
-
-            <div class="sidebar-title">
-                SMARTMASK
-            </div>
-
-            <div class="sidebar-subtitle">
-                Detection AI
-            </div>
-
+            <div class="sidebar-logo">🛡️</div>
+            <div class="sidebar-title">SMARTMASK</div>
+            <div class="sidebar-subtitle">Detection AI</div>
             <div class="sidebar-description">
                 AI-Powered Face Mask Monitoring
             </div>
-
         </div>
 
         <div class="sidebar-divider"></div>
         """,
         unsafe_allow_html=True
     )
-
 
 # ============================================================
 # RUN APPLICATION
