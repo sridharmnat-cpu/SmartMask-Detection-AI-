@@ -1,8 +1,10 @@
+```python
 import streamlit as st
 import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 # ============================================================
 # PAGE CONFIG — MUST BE THE FIRST STREAMLIT COMMAND
@@ -14,6 +16,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
+# ============================================================
+# IMPORTS
+# ============================================================
 from src.config import (
     DEFAULT_CONF,
     DEFAULT_IMGSZ,
@@ -30,13 +36,13 @@ from src.database import init_db
 
 
 # ============================================================
-# INITIALIZE DATABASE & DIRECTORIES
+# INITIALIZE DATABASE
 # ============================================================
 init_db()
 
 
 # ============================================================
-# INITIALIZE GLOBAL SESSION STATE SETTINGS
+# INITIALIZE SESSION STATE
 # ============================================================
 if "conf_threshold" not in st.session_state:
     st.session_state.conf_threshold = DEFAULT_CONF
@@ -61,20 +67,24 @@ if "screenshot_cooldown" not in st.session_state:
 
 
 # ============================================================
-# GLOBAL APPEARANCE — PROFESSIONAL LIGHT AI SECURITY THEME
+# GLOBAL APPEARANCE
 # ============================================================
 st.markdown(
     """
     <style>
+
+    /* ========================================================
+       GOOGLE FONT
+       ======================================================== */
 
     @import url(
         'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
     );
 
 
-    /* ============================================================
+    /* ========================================================
        ROOT VARIABLES
-       ============================================================ */
+       ======================================================== */
 
     :root {
         --sm-bg: #F4F6F9;
@@ -104,9 +114,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
-       BASE APP BACKGROUND
-       ============================================================ */
+    /* ========================================================
+       BASE APP
+       ======================================================== */
 
     .stApp {
         background-color: var(--sm-bg);
@@ -120,9 +130,22 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
+       GLOBAL FONT
+       ======================================================== */
+
+    body,
+    .stApp,
+    p,
+    span,
+    label {
+        font-family: 'Inter', sans-serif;
+    }
+
+
+    /* ========================================================
        SIDEBAR
-       ============================================================ */
+       ======================================================== */
 
     [data-testid="stSidebar"] {
         background-color: #FFFFFF !important;
@@ -131,39 +154,55 @@ st.markdown(
     }
 
 
-    /* ============================================================
-       SIDEBAR — FORCE TEXT VISIBILITY
-       ============================================================ */
+    /* ========================================================
+       SIDEBAR BRANDING
+       ======================================================== */
 
-    [data-testid="stSidebar"] * {
-        color: #111827 !important;
+    .sidebar-brand {
+        text-align: center;
+        padding: 8px 0 18px 0;
     }
 
-    [data-testid="stSidebar"] p,
-    [data-testid="stSidebar"] span,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] div {
-        font-family: 'Inter', sans-serif;
+    .sidebar-logo {
+        font-size: 32px;
+        line-height: 1.2;
+        margin-bottom: 4px;
+    }
+
+    .sidebar-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0F172A !important;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+    }
+
+    .sidebar-subtitle {
+        font-size: 12px;
+        font-weight: 600;
+        color: #2563EB !important;
+        margin-top: 2px;
+        line-height: 1.2;
+    }
+
+    .sidebar-description {
+        font-size: 11px;
+        font-weight: 500;
+        color: #64748B !important;
+        margin-top: 7px;
+        line-height: 1.4;
+    }
+
+    .sidebar-divider {
+        height: 1px;
+        background-color: #E4E8EF;
+        margin: 0 0 8px 0;
     }
 
 
-    /* ============================================================
-       SIDEBAR HEADINGS
-       ============================================================ */
-
-    [data-testid="stSidebar"] h1,
-    [data-testid="stSidebar"] h2,
-    [data-testid="stSidebar"] h3,
-    [data-testid="stSidebar"] h4,
-    [data-testid="stSidebar"] h5,
-    [data-testid="stSidebar"] h6 {
-        color: #111827 !important;
-    }
-
-
-    /* ============================================================
-       STREAMLIT SIDEBAR NAVIGATION
-       ============================================================ */
+    /* ========================================================
+       SIDEBAR NAVIGATION
+       ======================================================== */
 
     [data-testid="stSidebarNav"] {
         padding-top: 0.5rem;
@@ -177,25 +216,21 @@ st.markdown(
         margin: 2px 6px;
     }
 
-
-    /* Navigation text */
     [data-testid="stSidebarNav"] a span,
     [data-testid="stSidebarNav"] a p {
         color: #374151 !important;
         font-weight: 600 !important;
     }
 
-
-    /* Navigation icons */
     [data-testid="stSidebarNav"] a svg {
         color: #374151 !important;
         fill: #374151 !important;
     }
 
 
-    /* ============================================================
-       NAVIGATION HOVER
-       ============================================================ */
+    /* ========================================================
+       SIDEBAR NAVIGATION — HOVER
+       ======================================================== */
 
     [data-testid="stSidebarNav"] a:hover {
         background-color: #EFF4FF !important;
@@ -213,9 +248,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
-       ACTIVE / CURRENT PAGE
-       ============================================================ */
+    /* ========================================================
+       SIDEBAR NAVIGATION — ACTIVE PAGE
+       ======================================================== */
 
     [data-testid="stSidebarNav"] a[aria-current="page"] {
         background-color: #EFF4FF !important;
@@ -235,9 +270,29 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
+       SIDEBAR HEADINGS / TEXT
+       ======================================================== */
+
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] h4,
+    [data-testid="stSidebar"] h5,
+    [data-testid="stSidebar"] h6 {
+        color: #111827 !important;
+    }
+
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] label {
+        color: #111827;
+    }
+
+
+    /* ========================================================
        TYPOGRAPHY
-       ============================================================ */
+       ======================================================== */
 
     h1,
     h2,
@@ -250,11 +305,16 @@ st.markdown(
         font-weight: 700;
     }
 
-    p,
-    span,
-    label,
-    div {
-        font-family: 'Inter', sans-serif;
+    h1 {
+        font-size: 26px !important;
+    }
+
+    h2 {
+        font-size: 19px !important;
+    }
+
+    h3 {
+        font-size: 16px !important;
     }
 
     [data-testid="stCaptionContainer"] {
@@ -266,9 +326,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        KPI CARDS
-       ============================================================ */
+       ======================================================== */
 
     .kpi-card {
         background-color: var(--sm-panel);
@@ -318,9 +378,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        STATUS PANEL
-       ============================================================ */
+       ======================================================== */
 
     .status-panel {
         background-color: var(--sm-panel);
@@ -376,9 +436,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        ALERT BANNERS
-       ============================================================ */
+       ======================================================== */
 
     .violation-banner {
         background-color: var(--sm-danger-soft);
@@ -403,9 +463,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        HERO / HEADER
-       ============================================================ */
+       ======================================================== */
 
     .app-header {
         padding: 10px 0 20px 0;
@@ -418,18 +478,6 @@ st.markdown(
         margin: 0;
         font-weight: 800;
         letter-spacing: -0.02em;
-    }
-
-    h1 {
-        font-size: 26px !important;
-    }
-
-    h2 {
-        font-size: 19px !important;
-    }
-
-    h3 {
-        font-size: 16px !important;
     }
 
     .app-header p {
@@ -456,9 +504,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        CAMERA / VIDEO / IMAGE
-       ============================================================ */
+       ======================================================== */
 
     [data-testid="stImage"] img {
         border-radius: 18px !important;
@@ -481,9 +529,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        STATUS CHIPS
-       ============================================================ */
+       ======================================================== */
 
     .status-chip {
         display: inline-flex;
@@ -521,9 +569,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        LIVE BADGE
-       ============================================================ */
+       ======================================================== */
 
     .live-badge {
         display: inline-flex;
@@ -577,9 +625,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
-       STREAMLIT BUTTONS
-       ============================================================ */
+    /* ========================================================
+       BUTTONS
+       ======================================================== */
 
     .stButton > button {
         border-radius: 10px;
@@ -607,9 +655,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        DOWNLOAD BUTTON
-       ============================================================ */
+       ======================================================== */
 
     .stDownloadButton > button {
         border-radius: 10px;
@@ -625,9 +673,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        TABLES
-       ============================================================ */
+       ======================================================== */
 
     div[data-testid="stTable"] table {
         background-color: var(--sm-panel);
@@ -643,9 +691,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
-       METRIC WIDGET
-       ============================================================ */
+    /* ========================================================
+       METRICS
+       ======================================================== */
 
     div[data-testid="stMetric"] {
         background-color: var(--sm-panel);
@@ -660,9 +708,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        INPUTS
-       ============================================================ */
+       ======================================================== */
 
     .stTextInput input,
     .stSelectbox div[data-baseweb="select"],
@@ -673,9 +721,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        EXPANDER
-       ============================================================ */
+       ======================================================== */
 
     div[data-testid="stExpander"] {
         background-color: var(--sm-panel);
@@ -684,9 +732,9 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        FILE UPLOADER
-       ============================================================ */
+       ======================================================== */
 
     [data-testid="stFileUploaderDropzone"] {
         background-color: #FAFBFD;
@@ -695,18 +743,18 @@ st.markdown(
     }
 
 
-    /* ============================================================
+    /* ========================================================
        TABS
-       ============================================================ */
+       ======================================================== */
 
     button[data-baseweb="tab"] {
         font-weight: 600;
     }
 
 
-    /* ============================================================
+    /* ========================================================
        SCROLLBAR
-       ============================================================ */
+       ======================================================== */
 
     ::-webkit-scrollbar {
         width: 8px;
@@ -733,7 +781,7 @@ st.markdown(
 
 
 # ============================================================
-# PAGE ROUTING DEFINITIONS
+# PAGE ROUTING
 # ============================================================
 
 dashboard_page = st.Page(
@@ -787,7 +835,7 @@ about_page = st.Page(
 
 
 # ============================================================
-# CREATE NAVIGATION SYSTEM
+# NAVIGATION SYSTEM
 # ============================================================
 
 pg = st.navigation(
@@ -820,58 +868,35 @@ with st.sidebar:
 
     st.markdown(
         """
-        <div style="
-            text-align: center;
-            padding: 8px 0 18px 0;
-        ">
+        <div class="sidebar-brand">
 
-            <div style="
-                font-size: 32px;
-                line-height: 1.2;
-            ">
+            <div class="sidebar-logo">
                 🛡️
             </div>
 
-            <div style="
-                font-size: 16px;
-                font-weight: 800;
-                color: #0F172A !important;
-                letter-spacing: -0.01em;
-                margin-top: 4px;
-            ">
+            <div class="sidebar-title">
                 SMARTMASK
             </div>
 
-            <div style="
-                font-size: 12px;
-                font-weight: 600;
-                color: #2563EB !important;
-                margin-top: -2px;
-            ">
+            <div class="sidebar-subtitle">
                 Detection AI
             </div>
 
-            <div style="
-                font-size: 11px;
-                color: #64748B !important;
-                margin-top: 6px;
-            ">
+            <div class="sidebar-description">
                 AI-Powered Face Mask Monitoring
             </div>
 
         </div>
 
-        <hr style="
-            border-color: #E4E8EF !important;
-            margin-bottom: 6px;
-        ">
+        <div class="sidebar-divider"></div>
         """,
         unsafe_allow_html=True
     )
 
 
 # ============================================================
-# RUN PAGE ROUTER
+# RUN APPLICATION
 # ============================================================
 
 pg.run()
+```
