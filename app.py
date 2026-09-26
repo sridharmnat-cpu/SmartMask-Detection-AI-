@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import sys
 import os
@@ -899,4 +899,3 @@ with st.sidebar:
 # ============================================================
 
 pg.run()
-```
