@@ -1,6 +1,7 @@
 import streamlit as st
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # ============================================================
@@ -24,30 +25,40 @@ from src.config import (
     APP_TITLE,
     APP_SUBTITLE
 )
+
 from src.database import init_db
+
 
 # ============================================================
 # INITIALIZE DATABASE & DIRECTORIES
 # ============================================================
 init_db()
 
+
 # ============================================================
 # INITIALIZE GLOBAL SESSION STATE SETTINGS
 # ============================================================
 if "conf_threshold" not in st.session_state:
     st.session_state.conf_threshold = DEFAULT_CONF
+
 if "img_size" not in st.session_state:
     st.session_state.img_size = DEFAULT_IMGSZ
+
 if "frame_skip" not in st.session_state:
     st.session_state.frame_skip = DEFAULT_FRAME_SKIP
+
 if "voice_alert" not in st.session_state:
     st.session_state.voice_alert = DEFAULT_VOICE_ALERT
+
 if "voice_cooldown" not in st.session_state:
     st.session_state.voice_cooldown = DEFAULT_VOICE_COOLDOWN
+
 if "auto_screenshot" not in st.session_state:
     st.session_state.auto_screenshot = DEFAULT_AUTO_SCREENSHOT
+
 if "screenshot_cooldown" not in st.session_state:
     st.session_state.screenshot_cooldown = DEFAULT_SCREENSHOT_COOLDOWN
+
 
 # ============================================================
 # GLOBAL APPEARANCE — PROFESSIONAL LIGHT AI SECURITY THEME
@@ -55,30 +66,48 @@ if "screenshot_cooldown" not in st.session_state:
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    @import url(
+        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
+    );
+
+
+    /* ============================================================
+       ROOT VARIABLES
+       ============================================================ */
 
     :root {
         --sm-bg: #F4F6F9;
         --sm-panel: #FFFFFF;
         --sm-border: #E4E8EF;
+
         --sm-text: #0F172A;
         --sm-text-secondary: #64748B;
+
         --sm-accent: #2563EB;
+        --sm-accent-hover: #1D4ED8;
         --sm-accent-soft: #EFF4FF;
+
         --sm-success: #16A34A;
         --sm-success-soft: #ECFDF3;
+
         --sm-danger: #DC2626;
         --sm-danger-soft: #FEF2F2;
+
         --sm-warning: #D97706;
+
         --sm-radius: 18px;
-        --sm-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 6px 16px rgba(15, 23, 42, 0.05);
+
+        --sm-shadow:
+            0 1px 2px rgba(15, 23, 42, 0.05),
+            0 6px 16px rgba(15, 23, 42, 0.05);
     }
 
-    
 
     /* ============================================================
        BASE APP BACKGROUND
        ============================================================ */
+
     .stApp {
         background-color: var(--sm-bg);
         color: var(--sm-text);
@@ -90,44 +119,141 @@ st.markdown(
         padding-bottom: 3rem;
     }
 
+
     /* ============================================================
        SIDEBAR
        ============================================================ */
-    [data-testid="stSidebar"] {
-    background-color: #FFFFFF;
-    border-right: 1px solid var(--sm-border);
-    font-family: 'Inter', sans-serif;
-}
 
-    
+    [data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid var(--sm-border);
+        font-family: 'Inter', sans-serif;
+    }
+
+
+    /* ============================================================
+       SIDEBAR — FORCE TEXT VISIBILITY
+       ============================================================ */
+
+    [data-testid="stSidebar"] * {
+        color: #111827 !important;
+    }
+
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] div {
+        font-family: 'Inter', sans-serif;
+    }
+
+
+    /* ============================================================
+       SIDEBAR HEADINGS
+       ============================================================ */
+
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] h4,
+    [data-testid="stSidebar"] h5,
+    [data-testid="stSidebar"] h6 {
+        color: #111827 !important;
+    }
+
+
+    /* ============================================================
+       STREAMLIT SIDEBAR NAVIGATION
+       ============================================================ */
+
+    [data-testid="stSidebarNav"] {
+        padding-top: 0.5rem;
+    }
 
     [data-testid="stSidebarNav"] a {
-        border-radius: 10px;
-        color: var(--sm-text-secondary) !important;
-        font-weight: 500;
+        border-radius: 10px !important;
+        color: #374151 !important;
+        background-color: transparent !important;
+        font-weight: 600 !important;
+        margin: 2px 6px;
     }
+
+
+    /* Navigation text */
+    [data-testid="stSidebarNav"] a span,
+    [data-testid="stSidebarNav"] a p {
+        color: #374151 !important;
+        font-weight: 600 !important;
+    }
+
+
+    /* Navigation icons */
+    [data-testid="stSidebarNav"] a svg {
+        color: #374151 !important;
+        fill: #374151 !important;
+    }
+
+
+    /* ============================================================
+       NAVIGATION HOVER
+       ============================================================ */
 
     [data-testid="stSidebarNav"] a:hover {
-        background-color: var(--sm-accent-soft);
-        color: var(--sm-accent) !important;
+        background-color: #EFF4FF !important;
+        color: #2563EB !important;
     }
 
-    [data-testid="stSidebarNav"] a[aria-current="page"] {
-        background-color: var(--sm-accent-soft);
-        color: var(--sm-accent) !important;
-        font-weight: 700;
+    [data-testid="stSidebarNav"] a:hover span,
+    [data-testid="stSidebarNav"] a:hover p {
+        color: #2563EB !important;
     }
+
+    [data-testid="stSidebarNav"] a:hover svg {
+        color: #2563EB !important;
+        fill: #2563EB !important;
+    }
+
+
+    /* ============================================================
+       ACTIVE / CURRENT PAGE
+       ============================================================ */
+
+    [data-testid="stSidebarNav"] a[aria-current="page"] {
+        background-color: #EFF4FF !important;
+        color: #2563EB !important;
+        font-weight: 700 !important;
+    }
+
+    [data-testid="stSidebarNav"] a[aria-current="page"] span,
+    [data-testid="stSidebarNav"] a[aria-current="page"] p {
+        color: #2563EB !important;
+        font-weight: 700 !important;
+    }
+
+    [data-testid="stSidebarNav"] a[aria-current="page"] svg {
+        color: #2563EB !important;
+        fill: #2563EB !important;
+    }
+
 
     /* ============================================================
        TYPOGRAPHY
        ============================================================ */
-    h1, h2, h3, h4, h5, h6 {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         color: var(--sm-text) !important;
         font-family: 'Inter', sans-serif;
         font-weight: 700;
     }
 
-    p, span, label, div {
+    p,
+    span,
+    label,
+    div {
         font-family: 'Inter', sans-serif;
     }
 
@@ -139,9 +265,11 @@ st.markdown(
         border-color: var(--sm-border) !important;
     }
 
+
     /* ============================================================
        KPI CARDS
        ============================================================ */
+
     .kpi-card {
         background-color: var(--sm-panel);
         border: 1px solid var(--sm-border);
@@ -149,13 +277,17 @@ st.markdown(
         padding: 22px;
         text-align: center;
         margin: 5px;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
         box-shadow: var(--sm-shadow);
     }
 
     .kpi-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08), 0 12px 28px rgba(15, 23, 42, 0.06);
+        box-shadow:
+            0 4px 10px rgba(15, 23, 42, 0.08),
+            0 12px 28px rgba(15, 23, 42, 0.06);
     }
 
     .kpi-title {
@@ -173,13 +305,23 @@ st.markdown(
         color: var(--sm-text);
     }
 
-    .kpi-value.safe { color: var(--sm-success); }
-    .kpi-value.violation { color: var(--sm-danger); }
-    .kpi-value.accent { color: var(--sm-accent); }
+    .kpi-value.safe {
+        color: var(--sm-success);
+    }
+
+    .kpi-value.violation {
+        color: var(--sm-danger);
+    }
+
+    .kpi-value.accent {
+        color: var(--sm-accent);
+    }
+
 
     /* ============================================================
-       STATUS PANEL / SYSTEM STATUS CARDS
+       STATUS PANEL
        ============================================================ */
+
     .status-panel {
         background-color: var(--sm-panel);
         border: 1px solid var(--sm-border);
@@ -233,9 +375,11 @@ st.markdown(
         color: var(--sm-text-secondary);
     }
 
+
     /* ============================================================
        ALERT BANNERS
        ============================================================ */
+
     .violation-banner {
         background-color: var(--sm-danger-soft);
         border: 1px solid #FCA5A5;
@@ -258,9 +402,11 @@ st.markdown(
         font-weight: 600;
     }
 
+
     /* ============================================================
        HERO / HEADER
        ============================================================ */
+
     .app-header {
         padding: 10px 0 20px 0;
         border-bottom: 1px solid var(--sm-border);
@@ -274,7 +420,6 @@ st.markdown(
         letter-spacing: -0.02em;
     }
 
-    /* Tone down default Streamlit page titles to keep the UI clean and enterprise-like */
     h1 {
         font-size: 26px !important;
     }
@@ -310,9 +455,11 @@ st.markdown(
         margin-bottom: 12px;
     }
 
+
     /* ============================================================
-       CAMERA / VIDEO / IMAGE VISUALS
+       CAMERA / VIDEO / IMAGE
        ============================================================ */
+
     [data-testid="stImage"] img {
         border-radius: 18px !important;
         border: 1px solid var(--sm-border);
@@ -325,7 +472,6 @@ st.markdown(
         box-shadow: var(--sm-shadow);
     }
 
-    /* Native bordered containers (st.container(border=True)) used for the camera panel */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: var(--sm-panel);
         border: 1px solid var(--sm-border) !important;
@@ -334,7 +480,11 @@ st.markdown(
         padding: 4px;
     }
 
-    /* Status chips (Camera / Model / Detection indicators) */
+
+    /* ============================================================
+       STATUS CHIPS
+       ============================================================ */
+
     .status-chip {
         display: inline-flex;
         align-items: center;
@@ -356,11 +506,25 @@ st.markdown(
         display: inline-block;
     }
 
-    .dot-green { background-color: var(--sm-success); box-shadow: 0 0 5px rgba(22,163,74,0.5); }
-    .dot-red { background-color: var(--sm-danger); box-shadow: 0 0 5px rgba(220,38,38,0.5); }
-    .dot-gray { background-color: #94A3B8; }
+    .dot-green {
+        background-color: var(--sm-success);
+        box-shadow: 0 0 5px rgba(22, 163, 74, 0.5);
+    }
 
-    /* Live indicator badge, top-right of camera card */
+    .dot-red {
+        background-color: var(--sm-danger);
+        box-shadow: 0 0 5px rgba(220, 38, 38, 0.5);
+    }
+
+    .dot-gray {
+        background-color: #94A3B8;
+    }
+
+
+    /* ============================================================
+       LIVE BADGE
+       ============================================================ */
+
     .live-badge {
         display: inline-flex;
         align-items: center;
@@ -399,49 +563,72 @@ st.markdown(
     }
 
     @keyframes sm-pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.35; }
-        100% { opacity: 1; }
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.35;
+        }
+
+        100% {
+            opacity: 1;
+        }
     }
 
+
     /* ============================================================
-       STREAMLIT WIDGETS
+       STREAMLIT BUTTONS
        ============================================================ */
-    .stButton>button {
+
+    .stButton > button {
         border-radius: 10px;
         background-color: var(--sm-accent);
-        color: white;
+        color: white !important;
         font-weight: 600;
         border: none;
         padding: 8px 18px;
-        transition: background-color 0.15s ease, transform 0.1s ease;
-        box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
+        transition:
+            background-color 0.15s ease,
+            transform 0.1s ease;
+        box-shadow:
+            0 1px 2px rgba(37, 99, 235, 0.25);
     }
 
-    .stButton>button:hover {
-        background-color: #1D4ED8;
+    .stButton > button:hover {
+        background-color: var(--sm-accent-hover);
         border: none;
+        color: white !important;
     }
 
-    .stButton>button:disabled {
+    .stButton > button:disabled {
         background-color: #CBD5E1;
-        color: #F8FAFC;
+        color: #F8FAFC !important;
     }
 
-    .stDownloadButton>button {
+
+    /* ============================================================
+       DOWNLOAD BUTTON
+       ============================================================ */
+
+    .stDownloadButton > button {
         border-radius: 10px;
         font-weight: 600;
         border: 1px solid var(--sm-border);
         background-color: var(--sm-panel);
-        color: var(--sm-text);
+        color: var(--sm-text) !important;
     }
 
-    .stDownloadButton>button:hover {
+    .stDownloadButton > button:hover {
         border-color: var(--sm-accent);
-        color: var(--sm-accent);
+        color: var(--sm-accent) !important;
     }
 
-    /* Tables */
+
+    /* ============================================================
+       TABLES
+       ============================================================ */
+
     div[data-testid="stTable"] table {
         background-color: var(--sm-panel);
         color: var(--sm-text);
@@ -455,7 +642,11 @@ st.markdown(
         overflow: hidden;
     }
 
-    /* Metric widget polish */
+
+    /* ============================================================
+       METRIC WIDGET
+       ============================================================ */
+
     div[data-testid="stMetric"] {
         background-color: var(--sm-panel);
         border: 1px solid var(--sm-border);
@@ -468,83 +659,219 @@ st.markdown(
         color: var(--sm-text-secondary) !important;
     }
 
-    /* Inputs */
-    .stTextInput input, .stSelectbox div[data-baseweb="select"], .stTextArea textarea {
+
+    /* ============================================================
+       INPUTS
+       ============================================================ */
+
+    .stTextInput input,
+    .stSelectbox div[data-baseweb="select"],
+    .stTextArea textarea {
         border-radius: 10px !important;
         border: 1px solid var(--sm-border) !important;
         background-color: var(--sm-panel) !important;
     }
 
-    /* Expander polish */
+
+    /* ============================================================
+       EXPANDER
+       ============================================================ */
+
     div[data-testid="stExpander"] {
         background-color: var(--sm-panel);
         border: 1px solid var(--sm-border);
         border-radius: 16px;
     }
 
-    /* File uploader */
+
+    /* ============================================================
+       FILE UPLOADER
+       ============================================================ */
+
     [data-testid="stFileUploaderDropzone"] {
         background-color: #FAFBFD;
         border: 2px dashed #C7D2E0;
         border-radius: 20px;
     }
 
-    /* Tabs polish */
+
+    /* ============================================================
+       TABS
+       ============================================================ */
+
     button[data-baseweb="tab"] {
         font-weight: 600;
     }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--sm-bg); }
-    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--sm-accent); }
+
+    /* ============================================================
+       SCROLLBAR
+       ============================================================ */
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--sm-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--sm-accent);
+    }
+
     </style>
     """,
     unsafe_allow_html=True
 )
 
+
 # ============================================================
 # PAGE ROUTING DEFINITIONS
 # ============================================================
-dashboard_page = st.Page("pages/dashboard.py", title="Dashboard", icon="📊", default=True)
-image_detection_page = st.Page("pages/image_detection.py", title="Image Detection", icon="🖼️")
-live_camera_page = st.Page("pages/live_camera.py", title="Live Camera", icon="📷")
-video_detection_page = st.Page("pages/video_detection.py", title="Video Detection", icon="🎥")
-analytics_page = st.Page("pages/analytics.py", title="Analytics", icon="📈")
-history_page = st.Page("pages/history.py", title="Detection History", icon="📁")
-settings_page = st.Page("pages/settings.py", title="Settings", icon="⚙️")
-about_page = st.Page("pages/about.py", title="About", icon="ℹ️")
 
-# Create Navigation System
-pg = st.navigation({
-    "MONITORING": [dashboard_page, image_detection_page, live_camera_page, video_detection_page],
-    "ANALYSIS & ARCHIVE": [analytics_page, history_page],
-    "SYSTEM": [settings_page, about_page]
-})
+dashboard_page = st.Page(
+    "pages/dashboard.py",
+    title="Dashboard",
+    icon="📊",
+    default=True
+)
+
+image_detection_page = st.Page(
+    "pages/image_detection.py",
+    title="Image Detection",
+    icon="🖼️"
+)
+
+live_camera_page = st.Page(
+    "pages/live_camera.py",
+    title="Live Camera",
+    icon="📷"
+)
+
+video_detection_page = st.Page(
+    "pages/video_detection.py",
+    title="Video Detection",
+    icon="🎥"
+)
+
+analytics_page = st.Page(
+    "pages/analytics.py",
+    title="Analytics",
+    icon="📈"
+)
+
+history_page = st.Page(
+    "pages/history.py",
+    title="Detection History",
+    icon="📁"
+)
+
+settings_page = st.Page(
+    "pages/settings.py",
+    title="Settings",
+    icon="⚙️"
+)
+
+about_page = st.Page(
+    "pages/about.py",
+    title="About",
+    icon="ℹ️"
+)
+
+
+# ============================================================
+# CREATE NAVIGATION SYSTEM
+# ============================================================
+
+pg = st.navigation(
+    {
+        "MONITORING": [
+            dashboard_page,
+            image_detection_page,
+            live_camera_page,
+            video_detection_page
+        ],
+
+        "ANALYSIS & ARCHIVE": [
+            analytics_page,
+            history_page
+        ],
+
+        "SYSTEM": [
+            settings_page,
+            about_page
+        ]
+    }
+)
+
 
 # ============================================================
 # SIDEBAR BRANDING
 # ============================================================
+
 with st.sidebar:
+
     st.markdown(
         """
-        <div style="text-align:center; padding: 8px 0 18px 0;">
-            <div style="font-size: 32px;">🛡️</div>
-            <div style="font-size: 16px; font-weight: 800; color: #0F172A; letter-spacing: -0.01em;">
+        <div style="
+            text-align: center;
+            padding: 8px 0 18px 0;
+        ">
+
+            <div style="
+                font-size: 32px;
+                line-height: 1.2;
+            ">
+                🛡️
+            </div>
+
+            <div style="
+                font-size: 16px;
+                font-weight: 800;
+                color: #0F172A !important;
+                letter-spacing: -0.01em;
+                margin-top: 4px;
+            ">
                 SMARTMASK
             </div>
-            <div style="font-size: 12px; font-weight: 600; color: #2563EB; margin-top: -2px;">
+
+            <div style="
+                font-size: 12px;
+                font-weight: 600;
+                color: #2563EB !important;
+                margin-top: -2px;
+            ">
                 Detection AI
             </div>
-            <div style="font-size: 11px; color: #64748B; margin-top: 6px;">
+
+            <div style="
+                font-size: 11px;
+                color: #64748B !important;
+                margin-top: 6px;
+            ">
                 AI-Powered Face Mask Monitoring
             </div>
+
         </div>
-        <hr style="border-color: #E4E8EF; margin-bottom: 6px;">
+
+        <hr style="
+            border-color: #E4E8EF !important;
+            margin-bottom: 6px;
+        ">
         """,
         unsafe_allow_html=True
     )
 
-# Run page router
+
+# ============================================================
+# RUN PAGE ROUTER
+# ============================================================
+
 pg.run()
